@@ -32,6 +32,8 @@ QueueHandle_t xQueueCreateCountingSemaphore (const UBaseType_t uxMaxCount,
 
 void vQueueDelete (QueueHandle_t xQueue);
 
+#define vQueueDeleteWithCaps vQueueDelete
+
 BaseType_t xQueueReset (QueueHandle_t xQueue);
 
 BaseType_t xQueueGenericReceive (QueueHandle_t xQueue,
