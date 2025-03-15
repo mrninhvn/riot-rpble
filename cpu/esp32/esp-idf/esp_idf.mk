@@ -12,12 +12,9 @@ INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_driver_gpio/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/ldo/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/port/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/port/$(CPU_FAM)
-#INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/port/$(CPU_FAM)/private_include
-#INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_ipc/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_mm/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_pm/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_system/port/include/private
-#INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_system/port/public_compat
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_timer/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_timer/private_include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/freertos/esp_additions/include
@@ -29,14 +26,6 @@ INCLUDES += -I$(ESP32_SDK_DIR)/components/spi_flash/include
 ifneq (,$(filter xtensa%,$(TARGET_ARCH)))
   INCLUDES += -I$(ESP32_SDK_DIR)/components/xtensa/include
   INCLUDES += -I$(ESP32_SDK_DIR)/components/xtensa/$(CPU_FAM)/include
-endif
-
-ifneq (,$(filter esp32c3 esp32h2 esp32s3,$(CPU_FAM)))
-#  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_hw_support/port/$(CPU_FAM)/private_include
-endif
-
-ifeq (esp32c3,$(CPU_FAM))
-#  INCLUDES += -I$(ESP32_SDK_DIR)/components/esp_driver_usb_serial_jtag/include
 endif
 
 ifeq (esp32s3,$(CPU_FAM))

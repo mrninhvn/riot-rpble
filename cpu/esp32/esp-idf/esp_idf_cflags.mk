@@ -35,11 +35,7 @@ CFLAGS += -Wno-enum-compare
 CFLAGS += -Wno-cast-align
 
 # TODO: required to be able to compile with GCC 14.0, remove them later
-#CFLAGS += -Wno-attributes
 CFLAGS += -Wno-enum-conversion
-#CFLAGS += -Wno-error=format=
-#CFLAGS += -Wno-format
-#CFLAGS += -Wno-use-after-free
 CFLAGS += -Wno-incompatible-pointer-types
 CFLAGS += -Wno-unused-function
 
