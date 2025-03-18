@@ -213,7 +213,7 @@ int ws281x_init(ws281x_t *dev, const ws281x_params_t *params)
         .resolution_hz = WS281x_RMT_FREQ,
         .gpio_num = params->pin,
         .trans_queue_depth = 4,
-#if 0 /* SOC_RMT_SUPPORT_DMA - does not work out-of-the-box with DMA */ 
+#if 0 /* SOC_RMT_SUPPORT_DMA - does not work out-of-the-box with DMA */
         .flags.with_dma = true,
         .mem_block_symbols = 64, /* can be 1.024 symbols (4 kByte) */
 #else
