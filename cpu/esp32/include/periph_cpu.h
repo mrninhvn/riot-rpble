@@ -925,7 +925,7 @@ typedef struct {
 
 /** Timer group used for system time */
 #define TIMER_SYSTEM_GROUP      0   /* formerly TIMER_GROUP_0 */
-/** Index of the timer in the timer timer group used for system time */
+/** Index of the timer in the timer group used for system time */
 #define TIMER_SYSTEM_INDEX      0   /* formerly TIMER_0 */
 /** System time interrupt source */
 #define TIMER_SYSTEM_INT_SRC    ETS_TG0_T0_LEVEL_INTR_SOURCE
