@@ -19,6 +19,7 @@
  */
 
 #include "irq_arch.h"
+#include "log.h"
 
 #include "esp_attr.h"
 #include "esp_bit_defs.h"
@@ -46,35 +47,20 @@ typedef struct intr_handle_data_t {
 
 /* TODO change to a clearer approach */
 static const struct intr_handle_data_t _irq_data_table[] = {
+#ifndef __XTENSA__
     { ETS_FROM_CPU_INTR0_SOURCE, CPU_INUM_SOFTWARE, 1 },
+#endif
     { ETS_TG0_WDT_LEVEL_INTR_SOURCE, CPU_INUM_WDT, 1 },
     { ETS_TG0_T0_LEVEL_INTR_SOURCE, CPU_INUM_RTT, 1 },
-#if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S2) || defined(CPU_FAM_ESP32S3)
+#if SOC_TIMER_GROUP_TIMERS_PER_GROUP > 1
     { ETS_TG0_T1_LEVEL_INTR_SOURCE, CPU_INUM_TIMER, 2 },
 #endif
-#if !defined(CPU_FAM_ESP32C2)
+#if SOC_TIMER_GROUPS > 1
     { ETS_TG1_T0_LEVEL_INTR_SOURCE, CPU_INUM_TIMER, 2 },
-#endif
-#if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S2) || defined(CPU_FAM_ESP32S3)
+#if SOC_TIMER_GROUP_TIMERS_PER_GROUP > 1
     { ETS_TG1_T1_LEVEL_INTR_SOURCE, CPU_INUM_TIMER, 2 },
-#endif
-    { ETS_UART0_INTR_SOURCE, CPU_INUM_UART, 1 },
-    { ETS_UART1_INTR_SOURCE, CPU_INUM_UART, 1 },
-#if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S2) || defined(CPU_FAM_ESP32S3)
-    { ETS_UART2_INTR_SOURCE, CPU_INUM_UART, 1 },
-#endif
-    { ETS_GPIO_INTR_SOURCE, CPU_INUM_GPIO, 1 },
-    { ETS_I2C_EXT0_INTR_SOURCE, CPU_INUM_I2C, 1 },
-#if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S2) || defined(CPU_FAM_ESP32S3)
-    { ETS_I2C_EXT1_INTR_SOURCE, CPU_INUM_I2C, 1 },
-#endif
-#if defined(CPU_FAM_ESP32)
-    { ETS_ETH_MAC_INTR_SOURCE, CPU_INUM_ETH, 1 },
-#endif
-#if !defined(CPU_FAM_ESP32C2)
-    { ETS_TWAI_INTR_SOURCE, CPU_INUM_CAN, 1 },
-    { ETS_TIMER2_INTR_SOURCE, CPU_INUM_FRC2, 2 },
-#endif
+#endif /* SOC_TIMER_GROUP_TIMERS_PER_GROUP > 1 */
+#endif /* SOC_TIMER_GROUPS > 1 */
 #if defined(CPU_FAM_ESP32)
     { ETS_TG0_LACT_LEVEL_INTR_SOURCE, CPU_INUM_SYSTIMER, 2 },
 #elif defined(CPU_FAM_ESP32S2) || defined(CPU_FAM_ESP32S3) || defined(CPU_FAM_ESP32C3)
@@ -82,35 +68,44 @@ static const struct intr_handle_data_t _irq_data_table[] = {
 #else
 #error "Platform implementation is missing"
 #endif
-#if SOC_BLE_SUPPORTED
+    { ETS_UART0_INTR_SOURCE, CPU_INUM_UART, 1 },
+    { ETS_UART1_INTR_SOURCE, CPU_INUM_UART, 1 },
+#if SOC_UART_NUM > 2
+    { ETS_UART2_INTR_SOURCE, CPU_INUM_UART, 1 },
+#endif
+    { ETS_GPIO_INTR_SOURCE, CPU_INUM_GPIO, 1 },
+    { ETS_I2C_EXT0_INTR_SOURCE, CPU_INUM_I2C, 1 },
+#if SOC_I2C_NUM > 1
+    { ETS_I2C_EXT1_INTR_SOURCE, CPU_INUM_I2C, 1 },
+#endif
+#if defined(SOC_BLE_SUPPORTED)
 #if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S3) || defined(CPU_FAM_ESP32C3)
     { ETS_RWBLE_INTR_SOURCE, CPU_INUM_BLE, 2 },
 #else
 #error "Platform implementation is missing"
 #endif
 #endif /* SOC_BLE_SUPPORTED */
-#if defined(CPU_FAM_ESP32S2) || defined(CPU_FAM_ESP32S3)
+#if defined(SOC_EMAC_SUPPORTED)
+    { ETS_ETH_MAC_INTR_SOURCE, CPU_INUM_ETH, 1 },
+#endif
+#if defined(SOC_RMT_SUPPORTED)
+    { ETS_RMT_INTR_SOURCE, CPU_INUM_RMT, 1 },
+#endif
+#if defined(SOC_SDMMC_HOST_SUPPORTED)
+    { ETS_SDIO_HOST_INTR_SOURCE, CPU_INUM_SDMMC, 2 },
+#endif
+#if defined(SOC_TWAI_SUPPORTED)
+    { ETS_TWAI_INTR_SOURCE, CPU_INUM_CAN, 1 },
+#endif
+#if defined(SOC_USB_OTG_SUPPORTED)
     { ETS_USB_INTR_SOURCE, CPU_INUM_USB, 1 },
 #endif
-#if defined(ETS_USB_SERIAL_JTAG_INTR_SOURCE)
+#if defined(SOC_USB_SERIAL_JTAG_SUPPORTED)
     { ETS_USB_SERIAL_JTAG_INTR_SOURCE, CPU_INUM_SERIAL_JTAG, 1 },
-#endif
-    { ETS_RMT_INTR_SOURCE, CPU_INUM_RMT, 1 },
-#if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S2)
-    { ETS_I2S0_INTR_SOURCE, CPU_INUM_LCD, 1 },
-#elif defined(CPU_FAM_ESP32S3)
-    { ETS_LCD_CAM_INTR_SOURCE, CPU_INUM_LCD, 1 },
-#endif
-#if defined(CPU_FAM_ESP32) || defined(CPU_FAM_ESP32S2) || defined(CPU_FAM_ESP32S3)
-    { ETS_SDIO_HOST_INTR_SOURCE, CPU_INUM_SDMMC, 2 },
 #endif
 };
 
 #define IRQ_DATA_TABLE_SIZE        ARRAY_SIZE(_irq_data_table)
-
-#if defined(CPU_FAM_ESP32) && MODULE_ESP_LCD && MODULE_ESP_ETH
-#error "esp_eth and esp_lcd can't be used at the same time because of an interrupt conflict"
-#endif
 
 void esp_irq_init(void)
 {
@@ -169,8 +164,8 @@ esp_err_t esp_intr_alloc(int source, int flags, intr_handler_t handler,
     }
 
     if (i == IRQ_DATA_TABLE_SIZE) {
-        DEBUG("%s source=%d not found in interrupt allocation table\n",
-              __func__, source);
+        LOG_ERROR("%s source=%d not found in interrupt allocation table\n",
+                  __func__, source);
         return ESP_ERR_NOT_FOUND;
     }
 
