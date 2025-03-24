@@ -3,7 +3,15 @@ APPLICATION = gnrc_border_router
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= esp32s3-zero
+# USEMODULE += log
 USEMODULE += esp_log_startup
+USEMODULE += esp_log_colored
+USEMODULE += esp_log_tagged
+USEMODULE += esp_idf_heap
+USEMODULE += esp_spi_ram
+# USEMODULE += esp_wifi
+USEMODULE += stdio_usb_serial_jtag
+# USEMODULE += stdio_uart
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../../../..
@@ -26,7 +34,7 @@ ifeq (,$(filter ethos slip cdc-ecm wifi ethernet,$(UPLINK)))
 endif
 
 # Set the SSID and password of your WiFi network here
-WIFI_SSID ?= "Rogo_Nest"
+WIFI_SSID ?= "Rogo_Guest"
 WIFI_PASS ?= "nao123456"
 
 # Include packages that pull up and auto-init the link layer.
