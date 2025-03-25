@@ -1,11 +1,11 @@
 # name of your application
-APPLICATION = gnrc_networking
+APPLICATION = rpble_node_router
 
 # If no BOARD is found in the environment, use this default:
-BOARD ?= esp32s3-zero
+BOARD ?= esp32c3-devkit
 
 # This has to be the absolute path to the RIOT base directory:
-RIOTBASE ?= $(CURDIR)/../../../..
+RIOTBASE ?= $(CURDIR)/../..
 
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
@@ -28,8 +28,6 @@ USEMODULE += ps
 USEMODULE += netstats_l2
 USEMODULE += netstats_ipv6
 USEMODULE += netstats_rpl
-
-# RPL over BLE
 USEMODULE += nimble_rpble
 
 # Optionally include DNS support. This includes resolution of names at an

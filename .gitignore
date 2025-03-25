@@ -38,7 +38,7 @@ cachegrind.out*
 *.project
 # Visual Studio Code user settings
 .vscode/*
-!.vscode/settings.json
+# !.vscode/settings.json
 # ctags index files
 tags
 # GDB initialization scripts

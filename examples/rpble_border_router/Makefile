@@ -1,32 +1,22 @@
 # name of your application
-APPLICATION = gnrc_border_router
+APPLICATION = rpble_border_router
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= esp32s3-zero
-# USEMODULE += log
 USEMODULE += esp_log_startup
 USEMODULE += esp_log_colored
-USEMODULE += esp_log_tagged
-USEMODULE += esp_idf_heap
-USEMODULE += esp_spi_ram
-# USEMODULE += esp_wifi
-USEMODULE += stdio_usb_serial_jtag
-# USEMODULE += stdio_uart
+USEMODULE += stdio_uart
+
+USEMODULE += ws281x_esp32
+
+CFLAGS += -DCONFIG_GNRC_RPL_DEFAULT_NETIF=10
 
 # This has to be the absolute path to the RIOT base directory:
-RIOTBASE ?= $(CURDIR)/../../../..
+RIOTBASE ?= $(CURDIR)/../..
 
 # Default to using ethos for providing the uplink when not on native
 UPLINK ?= wifi
 DOWNLINK ?= ble
-
-# If enabled will configure a default DNS resolver and propagate it via the
-# RDNSS option to the hosts
-ENABLE_DNS ?= 1
-# If the above setting is active this setting will also enable DNS caching,
-# consequently dedicating some more memory space in order to reduce DNS
-# requests
-ENABLE_DNS_CACHING ?= 1
 
 # Check if the selected Uplink is valid
 ifeq (,$(filter ethos slip cdc-ecm wifi ethernet,$(UPLINK)))
@@ -34,7 +24,7 @@ ifeq (,$(filter ethos slip cdc-ecm wifi ethernet,$(UPLINK)))
 endif
 
 # Set the SSID and password of your WiFi network here
-WIFI_SSID ?= "Rogo_Guest"
+WIFI_SSID ?= "Rogo_Nest"
 WIFI_PASS ?= "nao123456"
 
 # Include packages that pull up and auto-init the link layer.
@@ -53,18 +43,14 @@ USEMODULE += ps
 # Optionally include RPL as a routing protocol. When includede gnrc_uhcpc will
 # configure the node as a RPL DODAG root when receiving a prefix.
 USEMODULE += gnrc_rpl
+USEMODULE += auto_init_gnrc_rpl
+USEMODULE += gnrc_ipv6_router_default
 
 # Optionally include DNS support. This includes resolution of names at an
 # upstream DNS server and the handling of RDNSS options in Router Advertisements
 # to auto-configure that upstream DNS server.
-ifneq (0,$(ENABLE_DNS))
-  USEMODULE += sock_dns              # include DNS client
-  USEMODULE += gnrc_ipv6_nib_dns     # include RDNSS option handling
-  USEMODULE += auto_init_sock_dns    # configure default DNS resolver
-  ifneq (0,$(ENABLE_DNS_CACHING))
-    USEMODULE += dns_cache             # cache DNS responses
-  endif
-endif
+USEMODULE += sock_dns              # include DNS client
+USEMODULE += gnrc_ipv6_nib_dns     # include RDNSS option handling
 
 # When using a regular network uplink we should use DHCPv6
 ifneq (,$(filter cdc-ecm wifi ethernet,$(UPLINK))$(REUSE_TAP))
@@ -81,9 +67,6 @@ endif
 ifeq (dhcpv6,$(PREFIX_CONF))
   # include DHCPv6 client for 6LoWPAN border router
   USEMODULE += gnrc_dhcpv6_client_6lbr
-  # optionally also request an address via IA_NA in addition to the prefix.
-  # this is not needed when using SLAAC
-  USEMODULE += dhcpv6_client_ia_na
 else ifeq (uhcp,$(PREFIX_CONF))
   # include UHCP client
   USEMODULE += gnrc_uhcpc
