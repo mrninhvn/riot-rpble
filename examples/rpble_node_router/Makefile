@@ -2,14 +2,15 @@
 APPLICATION = rpble_node_router
 
 # If no BOARD is found in the environment, use this default:
-BOARD ?= esp32c3-devkit
+BOARD ?= esp32s3-zero
+CFLAGS += -DCONFIG_GNRC_RPL_DEFAULT_NETIF=10
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
-USEMODULE += netdev_default
+# USEMODULE += netdev_default
 USEMODULE += auto_init_gnrc_netif
 # Activate ICMPv6 error messages
 USEMODULE += gnrc_icmpv6_error
@@ -28,6 +29,9 @@ USEMODULE += ps
 USEMODULE += netstats_l2
 USEMODULE += netstats_ipv6
 USEMODULE += netstats_rpl
+
+# Include GNRC and RPL
+USEMODULE += gnrc_netif_single
 USEMODULE += nimble_rpble
 
 # Optionally include DNS support. This includes resolution of names at an
